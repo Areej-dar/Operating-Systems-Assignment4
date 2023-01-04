@@ -1,0 +1,83 @@
+#include<iostream>
+#include<pthread.h>
+#include<string>
+#include<string.h>
+#include<stdlib.h>
+#include<cstring>
+#include<algorithm>
+#include<semaphore.h> 
+using namespace std;
+
+string str;
+int i;
+pthread_mutex_t s; 
+void *thread_fun1(void *args)
+{
+pthread_mutex_lock(&s);
+cout<<"Main thread\n"<<endl;
+pthread_mutex_unlock(&s);
+}
+
+void *input_thread(void *args)
+{
+pthread_mutex_lock(&s);
+cout<<"I am in thread 1\n"<<endl;
+cout<<"Please enter a string\n"<<endl;
+cin>>str;
+pthread_mutex_unlock(&s);
+}
+
+void *reverse_thread(void *args)
+{
+pthread_mutex_lock(&s);
+cout<<"I am in thread 2\n"<<endl;
+cout<<"Reversed string\n"<<endl;
+    for(int i = str.length() - 1; i >= 0; i--)
+    {
+      	cout<<str[i]<<endl;
+    }
+pthread_mutex_unlock(&s);
+}
+
+void *capitalize_thread(void *args)
+{
+pthread_mutex_lock(&s);
+cout<<"\nI am in thread 3\n"<<endl;
+cout<<"Capitalized string\n"<<endl;
+    transform(str.begin(), str.end(), str.begin(), ::toupper);
+    cout<<str;
+pthread_mutex_unlock(&s);
+}
+
+void *shift_thread(void *args)
+{
+pthread_mutex_lock(&s);
+string shiftstr="";
+for(int i = 0; i < str.length(); i++)
+{
+    char shiftchar = str[i] + 2;
+    shiftstr += shiftchar;
+}
+
+cout << "\nShifted string\n" <<shiftstr<< endl;
+pthread_mutex_unlock(&s);
+}
+
+int main()
+{
+
+pthread_mutex_init(&s,NULL); 
+pthread_t thread1,thread2,thread3,thread4,thread5; 
+
+pthread_create(&thread1,NULL,thread_fun1,NULL);
+pthread_create(&thread2,NULL,input_thread,NULL);
+pthread_create(&thread3,NULL,reverse_thread,NULL);
+pthread_create(&thread4,NULL,capitalize_thread,NULL);
+pthread_create(&thread5,NULL,shift_thread,NULL);
+
+pthread_join(thread1,NULL); 
+pthread_join(thread2,NULL); 
+pthread_join(thread3,NULL); 
+pthread_join(thread4,NULL); 
+pthread_join(thread5,NULL); 
+}
